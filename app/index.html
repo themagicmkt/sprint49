@@ -1,0 +1,991 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Sprint 49 — Área do Aluno</title>
+<meta name="description" content="Sua jornada de 7 dias pra validar sua ideia no mercado real." />
+<meta name="theme-color" content="#0A0A0A" />
+
+<link rel="icon" type="image/jpeg" sizes="32x32" href="img/favicon-32.jpg" />
+<link rel="icon" type="image/jpeg" sizes="192x192" href="img/favicon-192.jpg" />
+<link rel="apple-touch-icon" href="img/favicon-192.jpg" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Iceland&family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          brand: {
+            orange: '#E96C2C',
+            orange2: '#F2884E',
+            ink: '#0A0A0A',
+            line: '#1F1F1F',
+            cream: '#F5F5F0',
+          },
+        },
+        fontFamily: {
+          display: ['Montserrat', 'system-ui', 'sans-serif'],
+          tech: ['Iceland', 'system-ui', 'sans-serif'],
+          sans: ['Montserrat', 'system-ui', 'sans-serif'],
+        },
+      },
+    },
+  };
+</script>
+
+<style>
+  html, body { background: #0A0A0A; color: #F5F5F0; font-family: 'Montserrat', system-ui, sans-serif; }
+  .display { font-family: 'Montserrat', system-ui, sans-serif; font-weight: 900; letter-spacing: -0.02em; }
+  .tech    { font-family: 'Iceland', system-ui, sans-serif; letter-spacing: 0.02em; }
+  .grain {
+    background-image: radial-gradient(rgba(233,108,44,0.06) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+
+  /* Botão primário grande (touch-friendly) */
+  .btn-primary {
+    display: inline-flex; align-items: center; justify-content: center;
+    background: #E96C2C; color: #0A0A0A;
+    font-weight: 900; text-transform: uppercase; letter-spacing: 0.04em;
+    padding: 1rem 1.5rem; border-radius: 14px;
+    transition: transform .12s ease, background .12s ease, box-shadow .12s ease;
+    box-shadow: 0 4px 0 0 rgba(0,0,0,0.25);
+    font-size: 0.95rem; line-height: 1;
+  }
+  .btn-primary:hover { background: #F2884E; transform: translateY(-1px); }
+  .btn-primary:active { transform: translateY(1px); box-shadow: 0 2px 0 0 rgba(0,0,0,0.25); }
+  .btn-primary[disabled] { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+  .btn-secondary {
+    display: inline-flex; align-items: center; justify-content: center;
+    background: rgba(255,255,255,0.06);
+    color: #fff;
+    font-weight: 700; padding: 0.85rem 1.25rem; border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.1);
+    transition: background .12s ease;
+    font-size: 0.9rem;
+  }
+  .btn-secondary:hover { background: rgba(255,255,255,0.1); }
+
+  .btn-ghost {
+    color: rgba(255,255,255,0.55); font-size: 0.8rem;
+    background: none; border: none; cursor: pointer;
+    transition: color .12s ease;
+  }
+  .btn-ghost:hover { color: #E96C2C; }
+
+  input.field {
+    width: 100%;
+    background: rgba(255,255,255,0.05);
+    border: 1.5px solid rgba(255,255,255,0.1);
+    color: #fff; padding: 0.95rem 1rem;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-family: inherit;
+    transition: border-color .12s ease, background .12s ease;
+  }
+  input.field:focus {
+    outline: none;
+    border-color: #E96C2C;
+    background: rgba(255,255,255,0.07);
+  }
+  input.field::placeholder { color: rgba(255,255,255,0.35); }
+
+  /* Day cards */
+  .day-card { transition: transform .15s ease, border-color .15s ease, background .15s ease; }
+  .day-card.unlocked:hover { transform: translateY(-2px); border-color: rgba(233,108,44,0.6); }
+  .day-card.completed { border-color: rgba(34,197,94,0.35); }
+  .day-card.locked { opacity: 0.55; }
+  .day-card.locked .day-card-cta { pointer-events: none; }
+
+  /* Progress bar */
+  .progress-bar {
+    background: rgba(255,255,255,0.08); height: 10px; border-radius: 999px; overflow: hidden;
+  }
+  .progress-bar > div {
+    background: linear-gradient(90deg, #E96C2C, #F2884E);
+    height: 100%; transition: width .35s cubic-bezier(.2,.7,.3,1);
+    box-shadow: 0 0 12px rgba(233,108,44,0.5);
+  }
+
+  /* Theory typography */
+  .theory h3 { font-family: Montserrat; font-weight: 900; font-size: 1.5rem; margin: 2rem 0 0.75rem; color: #fff; letter-spacing: -0.01em; }
+  .theory h4 { font-family: Montserrat; font-weight: 800; font-size: 1.1rem; margin: 1.75rem 0 0.6rem; color: #fff; }
+  .theory p { margin-bottom: 1rem; line-height: 1.7; color: rgba(245,245,240,0.85); }
+  .theory ul, .theory ol { margin: 0.75rem 0 1.25rem; padding-left: 1.25rem; line-height: 1.7; color: rgba(245,245,240,0.85); }
+  .theory ul li { list-style-type: disc; margin-bottom: 0.4rem; }
+  .theory ol li { list-style-type: decimal; margin-bottom: 0.4rem; }
+  .theory strong { color: #fff; font-weight: 700; }
+  .theory em { color: #E96C2C; font-style: italic; }
+  .theory .example {
+    background: rgba(233,108,44,0.08);
+    border-left: 3px solid #E96C2C;
+    padding: 1rem 1.25rem;
+    border-radius: 4px;
+    margin: 1rem 0;
+    font-style: italic;
+    color: rgba(245,245,240,0.92);
+  }
+
+  .doc-card {
+    transition: background .12s ease, border-color .12s ease, transform .12s ease;
+  }
+  .doc-card:hover {
+    background: rgba(233,108,44,0.06);
+    border-color: rgba(233,108,44,0.4);
+    transform: translateX(2px);
+  }
+
+  /* Locked badge "blink" */
+  @keyframes softpulse {
+    0%, 100% { opacity: 0.8; }
+    50%      { opacity: 1; }
+  }
+  .pulse { animation: softpulse 2.5s ease-in-out infinite; }
+
+  /* Hide native details marker */
+  details > summary { list-style: none; cursor: pointer; }
+  details > summary::-webkit-details-marker { display: none; }
+
+  /* View transitions */
+  .view {
+    animation: fadeIn .25s ease-out;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: none; }
+  }
+
+  /* Mobile bottom safe-area */
+  .safe-bottom { padding-bottom: calc(env(safe-area-inset-bottom) + 1rem); }
+</style>
+</head>
+<body class="antialiased min-h-screen">
+
+<!-- =====================================================================
+     LOGIN VIEW
+     ===================================================================== -->
+<section id="view-login" class="view hidden min-h-screen flex items-center justify-center px-5 py-10 relative overflow-hidden">
+  <div class="absolute inset-0 grain opacity-50 pointer-events-none"></div>
+  <div class="absolute -top-40 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full bg-brand-orange/15 blur-3xl pointer-events-none"></div>
+
+  <div class="relative w-full max-w-md">
+    <div class="flex justify-center mb-10">
+      <img src="img/logo-49.webp" alt="49 educação" class="h-10 sm:h-12 w-auto" />
+    </div>
+
+    <div class="bg-white/[0.03] border border-white/10 rounded-2xl p-7 sm:p-9 backdrop-blur-sm">
+      <p class="text-[10px] uppercase tracking-[0.3em] text-brand-orange font-bold mb-3">Área do aluno</p>
+      <h1 class="display text-2xl sm:text-3xl mb-2 leading-tight">Bem-vindo ao Sprint 49</h1>
+      <p class="text-white/65 text-sm mb-7 leading-relaxed">7 dias. 7 missões. Sua ideia validada no mercado real.</p>
+
+      <form id="login-form" class="space-y-4">
+        <div>
+          <label for="login-email" class="block text-xs uppercase tracking-widest text-white/50 font-bold mb-2">Seu email</label>
+          <input id="login-email" type="email" required autocomplete="email" inputmode="email"
+                 class="field" placeholder="voce@exemplo.com" />
+        </div>
+        <button type="submit" class="btn-primary w-full text-base">Entrar →</button>
+      </form>
+
+      <div class="mt-7 pt-5 border-t border-white/10 text-[11px] text-white/40 leading-relaxed">
+        <b class="text-brand-orange">Modo teste:</b> qualquer email funciona — seu progresso é salvo localmente no seu navegador.
+      </div>
+    </div>
+
+    <div class="mt-8 text-center text-xs text-white/35">
+      <a href="https://sprint49.com" class="hover:text-brand-orange transition">← Voltar pra sprint49.com</a>
+    </div>
+  </div>
+</section>
+
+
+<!-- =====================================================================
+     DASHBOARD VIEW
+     ===================================================================== -->
+<section id="view-dashboard" class="view hidden min-h-screen">
+
+  <!-- TOP BAR -->
+  <header class="border-b border-white/8 bg-brand-ink/80 backdrop-blur sticky top-0 z-30">
+    <div class="max-w-5xl mx-auto px-5 py-3 flex items-center justify-between gap-4">
+      <a href="#dashboard" class="flex items-center gap-3">
+        <img src="img/logo-49.webp" alt="49 educação" class="h-8 w-auto" />
+        <span class="hidden sm:inline-block text-xs uppercase tracking-[0.25em] text-white/50 border-l border-white/15 pl-3">Sprint 49</span>
+      </a>
+      <div class="relative">
+        <button id="user-menu-btn" class="flex items-center gap-2 text-sm font-bold text-white/90 hover:text-brand-orange transition">
+          <span id="header-name" class="max-w-[120px] truncate">Aluno</span>
+          <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div id="user-menu" class="hidden absolute right-0 top-full mt-2 bg-brand-ink border border-white/15 rounded-xl py-2 min-w-[200px] shadow-2xl">
+          <div class="px-4 py-2 border-b border-white/8">
+            <p class="text-[11px] uppercase tracking-widest text-white/40 font-bold">Logado como</p>
+            <p id="header-email" class="text-sm text-white/80 truncate">email</p>
+          </div>
+          <a href="#" data-action="toggle-demo" class="block px-4 py-2 text-sm text-white/80 hover:bg-brand-orange/15 hover:text-brand-orange transition">
+            <span class="block text-[10px] uppercase tracking-widest text-brand-orange font-bold">Dev</span>
+            <span id="demo-label">Ativar modo demo</span>
+          </a>
+          <a href="#" data-action="reset" class="block px-4 py-2 text-sm text-white/80 hover:bg-red-500/15 hover:text-red-400 transition">Resetar progresso</a>
+          <a href="#" data-action="logout" class="block px-4 py-2 text-sm text-white/80 hover:bg-white/10 transition">Sair</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-5xl mx-auto px-5 py-8 sm:py-12 safe-bottom">
+
+    <!-- WELCOME + PROGRESS -->
+    <section class="mb-10 sm:mb-12">
+      <p class="text-[10px] uppercase tracking-[0.3em] text-brand-orange font-bold mb-3">Sua jornada</p>
+      <h1 class="display text-3xl sm:text-4xl lg:text-5xl mb-2 leading-tight">Olá, <span id="dashboard-name" class="text-brand-orange">Aluno</span>.</h1>
+      <p id="dashboard-subtext" class="text-white/65 mb-7">Continue de onde parou.</p>
+
+      <div class="bg-white/[0.03] border border-white/10 rounded-2xl p-5 sm:p-6">
+        <div class="flex items-baseline justify-between mb-3 gap-3">
+          <span class="text-sm uppercase tracking-wider text-white/65 font-bold">Progresso</span>
+          <span id="dashboard-progress-text" class="text-sm text-brand-orange font-black whitespace-nowrap">0 de 7 · 0%</span>
+        </div>
+        <div class="progress-bar">
+          <div id="dashboard-progress-bar" style="width:0%"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DAYS GRID -->
+    <section>
+      <div class="flex items-baseline justify-between mb-5">
+        <h2 class="display text-xl sm:text-2xl">Os 7 dias</h2>
+        <span class="text-[10px] uppercase tracking-widest text-white/40">1 módulo / dia</span>
+      </div>
+
+      <div id="dashboard-days" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+    </section>
+
+  </main>
+</section>
+
+
+<!-- =====================================================================
+     MODULE VIEW
+     ===================================================================== -->
+<section id="view-module" class="view hidden min-h-screen">
+
+  <!-- TOP BAR -->
+  <header class="border-b border-white/8 bg-brand-ink/80 backdrop-blur sticky top-0 z-30">
+    <div class="max-w-3xl mx-auto px-5 py-3 flex items-center justify-between gap-4">
+      <a href="#dashboard" class="btn-ghost flex items-center gap-2">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        <span class="hidden sm:inline">Voltar pra jornada</span>
+        <span class="sm:hidden">Voltar</span>
+      </a>
+      <img src="img/logo-49.webp" alt="49 educação" class="h-7 w-auto" />
+    </div>
+  </header>
+
+  <main class="max-w-3xl mx-auto px-5 py-8 sm:py-12 safe-bottom">
+
+    <!-- HEADER DO MÓDULO -->
+    <header class="mb-8">
+      <div class="flex items-center gap-3 mb-4">
+        <span id="module-day-number" class="tech text-5xl sm:text-6xl text-brand-orange leading-none">D1</span>
+        <div class="flex-1">
+          <p class="text-[10px] uppercase tracking-[0.25em] text-white/40 font-bold"><span id="module-day-weekday">Segunda</span> · <span id="module-day-code">CODE</span></p>
+          <p class="text-[11px] text-white/40 mt-0.5">⏱ <span id="module-day-duration">~40 min</span></p>
+        </div>
+      </div>
+      <h1 id="module-title" class="display text-2xl sm:text-3xl lg:text-4xl mb-3 leading-tight">Título do dia</h1>
+      <p id="module-objective" class="text-white/70 leading-relaxed">Objetivo do dia.</p>
+    </header>
+
+    <!-- VÍDEO -->
+    <section class="mb-10">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="text-brand-orange">▶</span>
+        <h2 class="display text-sm uppercase tracking-widest">Aula em vídeo</h2>
+      </div>
+      <div class="aspect-video bg-black rounded-2xl overflow-hidden border border-white/10">
+        <iframe id="module-video" class="w-full h-full"
+                src=""
+                title="Aula" frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowfullscreen></iframe>
+      </div>
+    </section>
+
+    <!-- TEORIA -->
+    <section class="mb-10">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="text-brand-orange">📖</span>
+        <h2 class="display text-sm uppercase tracking-widest">Teoria</h2>
+      </div>
+      <div id="module-theory" class="theory"></div>
+    </section>
+
+    <!-- MATERIAIS -->
+    <section class="mb-10">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="text-brand-orange">📂</span>
+        <h2 class="display text-sm uppercase tracking-widest">Materiais pra baixar</h2>
+      </div>
+      <ul id="module-docs" class="space-y-2.5"></ul>
+    </section>
+
+    <!-- AÇÃO -->
+    <section class="border-t border-white/10 pt-8">
+      <button id="module-complete-btn" class="btn-primary w-full text-base">Marcar como concluído ✓</button>
+      <p class="text-center text-xs text-white/40 mt-4">Ao concluir, o próximo dia continua sendo liberado em 24h.</p>
+    </section>
+
+  </main>
+</section>
+
+
+<!-- =====================================================================
+     LÓGICA DO APP
+     ===================================================================== -->
+<script>
+  // ============================================================
+  // CONTEÚDO DOS 7 DIAS
+  // ============================================================
+  const DAYS = [
+    {
+      n: 1, weekday: 'Segunda', code: 'DECOMPOR', duration: '~40 min',
+      title: 'Decompor sua ideia em 3 hipóteses',
+      subtitle: 'Antes de validar, separe o que é fato do que é palpite.',
+      objective: 'Sair hoje com 3 frases testáveis: uma sobre cliente, uma sobre dor, uma sobre solução.',
+      videoId: 'dQw4w9WgXcQ',
+      theory: `
+        <p>A maior parte dos founders morre tentando validar a coisa errada. Você passa 6 meses construindo um app pra "PMEs que querem crescer" e descobre que o problema real não era crescimento — era cobrança. O cliente real não era a PME — era o contador dela.</p>
+
+        <p>Antes de falar com qualquer cliente, escreva <strong>três hipóteses</strong> separadas e específicas:</p>
+
+        <h4>1. Hipótese de cliente</h4>
+        <p>Quem é exatamente a pessoa que tem esse problema? Não vale "empresas brasileiras". Tem que ser cirúrgico:</p>
+        <p class="example">"Founders técnicos de startups B2B pré-seed que captaram entre R$ 500k e R$ 2M nos últimos 12 meses."</p>
+
+        <h4>2. Hipótese de dor</h4>
+        <p>Qual é exatamente a dor? Distinga <strong>dor</strong> (a pessoa já tentou resolver, gastou tempo/dinheiro, tem cicatriz) de <strong>inconveniência</strong> (incomoda, mas a pessoa não vai pagar pra resolver).</p>
+
+        <h4>3. Hipótese de solução</h4>
+        <p>Como sua solução resolve essa dor melhor que a alternativa atual? A "alternativa atual" quase nunca é "nada" — é Excel, Notion ou um processo manual. Sua solução compete contra isso, não contra o vácuo.</p>
+
+        <h4>Hoje você vai:</h4>
+        <ol>
+          <li>Escrever uma versão inicial das 3 hipóteses</li>
+          <li>Marcar cada uma como "específica" ou "vaga"</li>
+          <li>Reescrever todas as vagas até estarem específicas</li>
+        </ol>
+      `,
+      docs: [
+        { name: 'Matriz de Hipóteses (template)', size: 'PDF · 2 págs' },
+        { name: 'Cheatsheet: 5 testes pra cada hipótese', size: 'PDF · 1 pág' },
+        { name: 'Exemplos: hipóteses iniciais de Airbnb, Stripe e Notion', size: 'PDF · 3 págs' },
+      ],
+    },
+
+    {
+      n: 2, weekday: 'Terça', code: 'ICP', duration: '~40 min',
+      title: 'ICP cirúrgico: mapear seu cliente ideal',
+      subtitle: 'Esqueça "PMEs do Brasil". Vamos pra precisão de franco-atirador.',
+      objective: 'Sair com 1 ICP escrito com 8 atributos específicos.',
+      videoId: 'dQw4w9WgXcQ',
+      theory: `
+        <p>ICP (<em>Ideal Customer Profile</em>) é a descrição do cliente que você quer servir <strong>primeiro</strong>. Não é todo cliente possível — é o cliente onde:</p>
+        <ul>
+          <li>A dor é mais aguda</li>
+          <li>O acesso é mais fácil (você sabe onde achar)</li>
+          <li>A disposição a pagar é maior</li>
+        </ul>
+
+        <h4>Os 8 atributos do ICP cirúrgico</h4>
+        <ol>
+          <li><strong>Indústria/nicho:</strong> setor específico</li>
+          <li><strong>Tamanho:</strong> faturamento, funcionários, ARR</li>
+          <li><strong>Cargo:</strong> quem decide a compra</li>
+          <li><strong>Maturidade:</strong> em que estágio do problema está</li>
+          <li><strong>Geografia:</strong> onde está fisicamente</li>
+          <li><strong>Stack atual:</strong> que ferramentas usa hoje</li>
+          <li><strong>Sinais externos:</strong> comportamentos públicos que identificam essa pessoa</li>
+          <li><strong>Trigger event:</strong> o que precisou acontecer pra ela buscar solução</li>
+        </ol>
+
+        <p>Quanto mais específico, melhor. ICP genérico = ninguém compra. ICP cirúrgico = você sabe exatamente quem procurar amanhã.</p>
+      `,
+      docs: [
+        { name: 'ICP Canvas (template)', size: 'PDF · 1 pág' },
+        { name: 'Worksheet: 8 atributos preenchidos', size: 'PDF · 2 págs' },
+        { name: 'Exemplos de ICP de 5 startups do portfólio', size: 'PDF · 5 págs' },
+      ],
+    },
+
+    {
+      n: 3, weekday: 'Quarta', code: 'ACHAR', duration: '~60 min',
+      title: 'Encontrar 30 pessoas reais',
+      subtitle: 'Hoje. Sem teoria. LinkedIn, comunidades, indicação.',
+      objective: 'Sair com uma lista de 30 pessoas reais que batem com seu ICP.',
+      videoId: 'dQw4w9WgXcQ',
+      theory: `
+        <p>Hoje é o dia mais simples e o mais doloroso. Você vai encontrar 30 humanos reais que batem com o ICP que você escreveu ontem.</p>
+
+        <h4>Onde procurar (em ordem de eficácia)</h4>
+
+        <h4>1. LinkedIn (busca avançada ou Sales Navigator)</h4>
+        <p>Filtre por cargo + indústria + tamanho de empresa. Mira 50 prospects, captura nome + URL.</p>
+
+        <h4>2. Comunidades específicas</h4>
+        <p>Slack, Discord, grupos de Telegram do nicho. Não pra spammar — pra observar quem participa, quem reclama do problema, quem pergunta sobre a alternativa atual.</p>
+
+        <h4>3. Indicação direta</h4>
+        <p>Manda mensagem pra 10 pessoas da sua rede com essa frase exata:</p>
+        <p class="example">"Tô validando uma ideia pra [ICP específico]. Você conhece alguém que [comportamento específico]? Não preciso vender nada agora — só quero entender se a dor é real."</p>
+
+        <h4>Meta de hoje</h4>
+        <p>Lista com <strong>30 nomes</strong> + email/LinkedIn + 1 observação por pessoa (por que essa pessoa entra na lista). Sem isso, amanhã não tem com quem falar.</p>
+      `,
+      docs: [
+        { name: 'Lista de 50 comunidades B2B brasileiras', size: 'PDF · 4 págs' },
+        { name: 'Template de tracker de prospects (Sheets)', size: 'Link' },
+        { name: 'Script de mensagem pra rede pedindo indicação', size: 'PDF · 1 pág' },
+      ],
+    },
+
+    {
+      n: 4, weekday: 'Quinta', code: 'SCRIPT', duration: '~40 min',
+      title: 'Script + agenda de entrevistas',
+      subtitle: 'O Mom Test simplificado. Marca 10 calls em 24h.',
+      objective: 'Sair com 10 calls marcadas + 1 script de entrevista pronto.',
+      videoId: 'dQw4w9WgXcQ',
+      theory: `
+        <p>Founder que pergunta errado descobre as coisas erradas. O <em>Mom Test</em> (livro do Rob Fitzpatrick) ensina o princípio: pergunte sobre o <strong>passado</strong>, não sobre o futuro. Sobre <strong>comportamento real</strong>, não sobre opinião.</p>
+
+        <h4>❌ Perguntas que viciam a entrevista</h4>
+        <ul>
+          <li>"Você compraria um app que resolve X?"</li>
+          <li>"Quanto você pagaria por isso?"</li>
+          <li>"Você acha que essa ideia é boa?"</li>
+        </ul>
+        <p>Todas essas convidam o entrevistado a ser educado. Você sai achando que a ideia é incrível, e ninguém compra.</p>
+
+        <h4>✅ Perguntas que extraem verdade</h4>
+        <ul>
+          <li>"Quando foi a última vez que [problema] aconteceu?"</li>
+          <li>"O que você fez pra resolver?"</li>
+          <li>"Quanto tempo você gasta nisso por semana?"</li>
+          <li>"Quem mais é afetado?"</li>
+          <li>"Quanto custaria deixar do jeito que tá pelos próximos 6 meses?"</li>
+        </ul>
+
+        <h4>Cold message pra marcar a entrevista</h4>
+        <p class="example">"Oi {Nome}, vi seu perfil/post sobre {tópico específico}. Tô fazendo uma pesquisa rápida (20min, sem venda) com {ICP} sobre {dor}. Posso pegar 20min da sua agenda essa semana? Calendly: {link}"</p>
+      `,
+      docs: [
+        { name: 'Script de entrevista de problema (estrutura completa)', size: 'PDF · 3 págs' },
+        { name: '50 perguntas-mãe pra adaptar ao seu contexto', size: 'PDF · 5 págs' },
+        { name: 'Template de cold message + variações por canal', size: 'PDF · 2 págs' },
+      ],
+    },
+
+    {
+      n: 5, weekday: 'Sexta', code: 'ENTREVISTAR', duration: '~3h · 10 calls',
+      title: '10 entrevistas + matriz de extração',
+      subtitle: 'A matriz que transforma fofocas em padrão acionável.',
+      objective: 'Sair com 10 entrevistas feitas + 1 matriz com padrões identificados.',
+      videoId: 'dQw4w9WgXcQ',
+      theory: `
+        <p>Hoje é o dia em que a maioria desiste. Falar com 10 desconhecidos é desconfortável. Mas é aqui que mora o ouro.</p>
+
+        <h4>Durante cada call</h4>
+        <ul>
+          <li><strong>Cale a boca.</strong> 80% você escuta, 20% você pergunta.</li>
+          <li><strong>Não venda.</strong> Sequer mencione sua solução até a pessoa perguntar.</li>
+          <li><strong>Grave</strong> (com permissão) ou anote literalmente o que a pessoa fala.</li>
+        </ul>
+
+        <h4>Depois das 10 calls — matriz de extração</h4>
+        <p>Pra cada entrevista, registre:</p>
+        <ol>
+          <li><strong>Dor mencionada</strong> (palavras exatas da pessoa)</li>
+          <li><strong>Alternativa atual</strong> (o que ela usa hoje)</li>
+          <li><strong>Workaround</strong> (gambiarra/processo manual)</li>
+          <li><strong>Frequência</strong> (quantas vezes por semana/mês)</li>
+          <li><strong>Custo da dor</strong> (R$ ou tempo)</li>
+        </ol>
+
+        <h4>Padrão = ouro</h4>
+        <p>Se 7 das 10 pessoas mencionam a mesma dor com palavras parecidas, você achou algo. Se cada uma fala uma coisa, sua hipótese de cliente ou de dor está errada — <strong>pivote</strong>.</p>
+      `,
+      docs: [
+        { name: 'Matriz de extração de entrevistas (Sheets)', size: 'Link' },
+        { name: 'Template de notes pra cada call', size: 'PDF · 1 pág' },
+        { name: 'Anti-padrões: o que ignorar nas falas dos entrevistados', size: 'PDF · 2 págs' },
+      ],
+    },
+
+    {
+      n: 6, weekday: 'Sábado', code: 'LANDING', duration: '~2h',
+      title: 'Landing + teste pago de R$ 50',
+      subtitle: 'Uma página simples + 1 anúncio rodando até amanhã.',
+      objective: 'Sair com 1 landing no ar + 1 anúncio pago rodando.',
+      videoId: 'dQw4w9WgXcQ',
+      theory: `
+        <p>Você já tem 10 entrevistas. Algumas pessoas pediram pra ser avisadas quando o produto sair. Agora é a hora de transformar interesse em <strong>compromisso medível</strong>.</p>
+
+        <h4>O que vai na landing</h4>
+        <p>Não precisa de produto. Precisa de:</p>
+        <ul>
+          <li>Headline com a dor exata (palavra da entrevistada, não sua)</li>
+          <li>3 bullets do que o produto vai resolver</li>
+          <li>Email opt-in com CTA "Entrar na lista"</li>
+          <li>Opcional: botão "Pré-comprar com 50% off" pra teste mais forte</li>
+        </ul>
+
+        <h4>Ferramentas (5 min de setup)</h4>
+        <ul>
+          <li><strong>Carrd</strong> ou <strong>Framer</strong> pra construir</li>
+          <li><strong>Tally</strong> ou <strong>Typeform</strong> pro formulário</li>
+          <li><strong>Mailchimp</strong> grátis pra captar lista</li>
+        </ul>
+
+        <h4>O teste pago (R$ 50)</h4>
+        <p>Não pra escalar. Pra ter um sinal independente de tráfego frio.</p>
+        <ul>
+          <li>Meta Ads ou Google Ads</li>
+          <li>R$ 50 distribuídos em 2–3 dias</li>
+          <li>Targeting: o ICP do D2</li>
+          <li>Mira: 100+ visitantes na landing</li>
+          <li>Métrica: taxa de conversão pra email opt-in</li>
+        </ul>
+
+        <p>Tráfego frio + landing = teste imune a viés de relacionamento. É o teste mais honesto que tem.</p>
+      `,
+      docs: [
+        { name: 'Template de landing no Carrd (clone)', size: 'Link' },
+        { name: 'Setup de Meta Ads em 15 min', size: 'PDF · 6 págs' },
+        { name: 'Benchmarks de conversão por categoria', size: 'PDF · 2 págs' },
+      ],
+    },
+
+    {
+      n: 7, weekday: 'Domingo', code: 'DECIDIR', duration: '~60 min',
+      title: 'Decisão: Go · Pivot · Kill',
+      subtitle: 'Você lê os dados e sai com a decisão tomada. Sem chorar.',
+      objective: 'Tomar uma decisão escrita: continuar, pivotar ou matar.',
+      videoId: 'dQw4w9WgXcQ',
+      theory: `
+        <p>Hoje você não vai construir nada. Vai <strong>ler</strong> o que coletou e tomar uma decisão.</p>
+
+        <h4>Os dados que você tem agora</h4>
+        <ul>
+          <li>Matriz de extração das 10 entrevistas (D5)</li>
+          <li>Email opt-ins da landing (D6)</li>
+          <li>Taxa de conversão do anúncio pago (D6)</li>
+          <li>Comentários/reações qualitativas em mensagens</li>
+        </ul>
+
+        <h4>✅ GO — continuar como tá</h4>
+        <p>Sinais que você precisa pra ir adiante:</p>
+        <ul>
+          <li>7+ das 10 entrevistas confirmaram a dor com palavras parecidas</li>
+          <li>Pelo menos 3 pessoas mencionaram pagar/ter pago por solução parecida</li>
+          <li>Taxa de opt-in da landing &gt; 15%</li>
+          <li>Você consegue imaginar o produto V1 (sem programar) em &lt; 2 semanas</li>
+        </ul>
+
+        <h4>↻ PIVOT — mudar uma das hipóteses</h4>
+        <p>Sinais:</p>
+        <ul>
+          <li>A dor existe mas o ICP está errado (cliente certo é OUTRO perfil)</li>
+          <li>O ICP está certo mas a dor real era OUTRA</li>
+          <li>Houve interesse mas ninguém topou pagar — solução pode estar errada</li>
+        </ul>
+        <p>Pivote <strong>uma</strong> hipótese de cada vez. Não jogue tudo fora.</p>
+
+        <h4>❌ KILL — matar essa ideia</h4>
+        <p>Sinais:</p>
+        <ul>
+          <li>Ninguém mencionou a dor sem você induzir</li>
+          <li>A alternativa atual é "uma planilha que funciona bem"</li>
+          <li>Ninguém topou agendar entrevista</li>
+          <li>Você mesmo perdeu interesse durante a semana</li>
+        </ul>
+        <p>Matar uma ideia em 7 dias gastando R$ 200 é vitória. Você acabou de economizar 6 meses e R$ 50 mil. Vai pra próxima.</p>
+
+        <h4>Hoje você escreve</h4>
+        <p>Um parágrafo. <em>"Eu decidi [GO / PIVOT / KILL] porque [3 dados específicos]. Próximo passo: [ação concreta]."</em></p>
+        <p>Cola no Discord da turma. A galera vai dar feedback.</p>
+      `,
+      docs: [
+        { name: 'Decision Matrix do D7 (worksheet)', size: 'PDF · 2 págs' },
+        { name: 'Padrões de pivot mais comuns + exemplos', size: 'PDF · 4 págs' },
+        { name: 'Template de "post-mortem" pra ideias matadas', size: 'PDF · 1 pág' },
+      ],
+    },
+  ];
+
+
+  // ============================================================
+  // STATE
+  // ============================================================
+  const STORAGE_KEY = 'sprint49.state.v1';
+
+  let state = {
+    user: null,          // { email, name, startDate (ISO string) }
+    progress: {},        // { 1: { completed: true, at: '...' }, ... }
+    demoMode: false,
+  };
+
+  function loadState() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) state = { ...state, ...JSON.parse(raw) };
+    } catch(e) { console.warn('State load failed', e); }
+  }
+
+  function saveState() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+    catch(e) { console.warn('State save failed', e); }
+  }
+
+  function nameFromEmail(email) {
+    const local = (email || '').split('@')[0] || 'aluno';
+    return local.split(/[._-]+/)
+                .filter(Boolean)
+                .map(p => p.charAt(0).toUpperCase() + p.slice(1))
+                .join(' ');
+  }
+
+
+  // ============================================================
+  // DAY UNLOCK LOGIC
+  // ============================================================
+  const DAY_MS = 24 * 60 * 60 * 1000;
+
+  function isDayUnlocked(n) {
+    if (state.demoMode) return true;
+    if (!state.user) return false;
+    if (n === 1) return true;
+    const startMs = new Date(state.user.startDate).getTime();
+    const elapsedMs = Date.now() - startMs;
+    return elapsedMs >= (n - 1) * DAY_MS;
+  }
+
+  function timeUntilDay(n) {
+    if (!state.user) return Infinity;
+    const startMs = new Date(state.user.startDate).getTime();
+    const unlockMs = startMs + (n - 1) * DAY_MS;
+    return Math.max(0, unlockMs - Date.now());
+  }
+
+  function formatTimeLeft(ms) {
+    if (ms <= 0) return 'liberado';
+    const totalMin = Math.floor(ms / 60000);
+    const d = Math.floor(totalMin / (60 * 24));
+    const h = Math.floor((totalMin % (60 * 24)) / 60);
+    const m = totalMin % 60;
+    if (d > 0) return `${d}d ${h}h`;
+    if (h > 0) return `${h}h ${m}m`;
+    return `${m}m`;
+  }
+
+  function isDayCompleted(n) {
+    return state.progress[n]?.completed === true;
+  }
+
+  function markComplete(n) {
+    state.progress[n] = { completed: true, at: new Date().toISOString() };
+    saveState();
+  }
+
+  function unmarkComplete(n) {
+    delete state.progress[n];
+    saveState();
+  }
+
+  function progressPercent() {
+    const done = Object.values(state.progress).filter(p => p.completed).length;
+    return Math.round((done / 7) * 100);
+  }
+
+  function completedCount() {
+    return Object.values(state.progress).filter(p => p.completed).length;
+  }
+
+
+  // ============================================================
+  // AUTH
+  // ============================================================
+  function login(email) {
+    email = (email || '').trim().toLowerCase();
+    if (!email) return false;
+    if (!state.user || state.user.email !== email) {
+      state.user = {
+        email,
+        name: nameFromEmail(email),
+        startDate: state.user?.email === email
+          ? state.user.startDate
+          : new Date().toISOString(),
+      };
+      saveState();
+    }
+    return true;
+  }
+
+  function logout() {
+    if (!confirm('Tem certeza que quer sair? Seu progresso fica salvo.')) return;
+    state.user = null;
+    saveState();
+    location.hash = '#login';
+  }
+
+  function resetAll() {
+    if (!confirm('Resetar TUDO (login + progresso) e começar do zero?')) return;
+    state = { user: null, progress: {}, demoMode: false };
+    saveState();
+    location.hash = '#login';
+  }
+
+  function toggleDemo() {
+    state.demoMode = !state.demoMode;
+    saveState();
+    closeUserMenu();
+    navigate();
+  }
+
+
+  // ============================================================
+  // ROUTING + RENDER
+  // ============================================================
+  function showView(id) {
+    document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
+    document.getElementById(id).classList.remove('hidden');
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }
+
+  function navigate() {
+    const hash = location.hash || '';
+
+    if (!state.user) {
+      if (hash !== '#login') { location.hash = '#login'; return; }
+      showView('view-login');
+      return;
+    }
+
+    if (!hash || hash === '#login' || hash === '#') {
+      location.hash = '#dashboard';
+      return;
+    }
+
+    if (hash === '#dashboard') {
+      renderDashboard();
+      showView('view-dashboard');
+      return;
+    }
+
+    if (hash.startsWith('#day/')) {
+      const n = parseInt(hash.split('/')[1], 10);
+      if (!n || n < 1 || n > 7) { location.hash = '#dashboard'; return; }
+      if (!isDayUnlocked(n)) {
+        alert(`Dia ${n} ainda está bloqueado. Volta após ${formatTimeLeft(timeUntilDay(n))} ou ative o modo demo no menu (botão com seu nome).`);
+        location.hash = '#dashboard';
+        return;
+      }
+      renderModule(n);
+      showView('view-module');
+      return;
+    }
+
+    location.hash = '#dashboard';
+  }
+
+  function renderDashboard() {
+    document.getElementById('header-name').textContent = state.user.name;
+    document.getElementById('header-email').textContent = state.user.email;
+    document.getElementById('dashboard-name').textContent = state.user.name.split(' ')[0];
+
+    const done = completedCount();
+    const subtext = done === 0
+      ? (state.demoMode ? 'Modo demo ativo — todos os dias liberados.' : 'Sua jornada começa hoje. Bora pro Dia 1.')
+      : (done === 7 ? 'Você concluiu o Sprint 49. Vai pivotar, matar ou GO?'
+                    : 'Continue de onde parou.');
+    document.getElementById('dashboard-subtext').textContent = subtext;
+
+    document.getElementById('demo-label').textContent =
+      state.demoMode ? 'Desativar modo demo' : 'Ativar modo demo';
+
+    document.getElementById('dashboard-progress-bar').style.width = progressPercent() + '%';
+    document.getElementById('dashboard-progress-text').textContent =
+      `${done} de 7 dias · ${progressPercent()}%`;
+
+    const grid = document.getElementById('dashboard-days');
+    grid.innerHTML = DAYS.map(d => renderDayCard(d)).join('');
+  }
+
+  function renderDayCard(day) {
+    const unlocked  = isDayUnlocked(day.n);
+    const completed = isDayCompleted(day.n);
+    const timeLeft  = timeUntilDay(day.n);
+
+    let badge = '', cta = '', stateClass = '';
+
+    if (completed) {
+      stateClass = 'completed unlocked';
+      badge = `<span class="inline-flex items-center gap-1 text-[10px] uppercase tracking-widest text-green-400 font-black"><svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Concluído</span>`;
+      cta = `<a href="#day/${day.n}" class="btn-secondary w-full mt-5">Revisar conteúdo</a>`;
+    } else if (unlocked) {
+      stateClass = 'unlocked';
+      const tag = state.demoMode && day.n > 1 ? 'DEMO' : 'LIBERADO';
+      badge = `<span class="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-brand-orange font-black pulse"><span class="w-1.5 h-1.5 rounded-full bg-brand-orange"></span>${tag}</span>`;
+      cta = `<a href="#day/${day.n}" class="btn-primary w-full mt-5 day-card-cta">Começar agora →</a>`;
+    } else {
+      stateClass = 'locked';
+      badge = `<span class="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-white/40 font-black"><svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Libera em ${formatTimeLeft(timeLeft)}</span>`;
+      cta = `<button disabled class="btn-primary w-full mt-5 day-card-cta">Aguarde</button>`;
+    }
+
+    return `
+      <article class="day-card ${stateClass} bg-white/[0.03] border border-white/10 rounded-2xl p-5 sm:p-6">
+        <div class="flex items-start justify-between gap-3 mb-4">
+          <div class="flex items-baseline gap-2">
+            <span class="tech text-4xl text-brand-orange leading-none">D${day.n}</span>
+            <span class="text-[10px] uppercase tracking-widest text-white/40 font-bold">${day.weekday}</span>
+          </div>
+          ${badge}
+        </div>
+        <p class="text-[10px] uppercase tracking-widest text-white/40 font-bold mb-1.5">${day.code}</p>
+        <h3 class="display text-lg sm:text-xl mb-2 leading-tight ${unlocked ? '' : 'text-white/60'}">${day.title}</h3>
+        <p class="text-sm text-white/55 leading-snug">${day.subtitle}</p>
+        ${cta}
+      </article>
+    `;
+  }
+
+  function renderModule(n) {
+    const day = DAYS[n - 1];
+    if (!day) return;
+
+    document.getElementById('module-day-number').textContent = `D${n}`;
+    document.getElementById('module-day-weekday').textContent = day.weekday;
+    document.getElementById('module-day-code').textContent = day.code;
+    document.getElementById('module-day-duration').textContent = day.duration;
+    document.getElementById('module-title').textContent = day.title;
+    document.getElementById('module-objective').textContent = day.objective;
+
+    document.getElementById('module-video').src =
+      `https://www.youtube-nocookie.com/embed/${day.videoId}?rel=0&modestbranding=1`;
+
+    document.getElementById('module-theory').innerHTML = day.theory;
+
+    const docsEl = document.getElementById('module-docs');
+    docsEl.innerHTML = day.docs.map((doc, i) => `
+      <li>
+        <a href="#" data-doc-idx="${i}" class="doc-card flex items-center gap-4 bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3.5 group">
+          <span class="flex-none w-9 h-9 rounded-lg bg-brand-orange/15 text-brand-orange flex items-center justify-center">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          </span>
+          <span class="flex-1 leading-snug">
+            <span class="block text-sm text-white/90 font-semibold">${doc.name}</span>
+            <span class="block text-[11px] text-white/40 uppercase tracking-widest mt-0.5">${doc.size} · em breve</span>
+          </span>
+          <svg class="w-4 h-4 text-white/30 group-hover:text-brand-orange transition" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        </a>
+      </li>
+    `).join('');
+
+    docsEl.querySelectorAll('a[data-doc-idx]').forEach(a => {
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        alert('Material em breve. Quando o Sprint 49 entrar em produção, o PDF é liberado direto aqui na sua área.');
+      });
+    });
+
+    const completeBtn = document.getElementById('module-complete-btn');
+    if (isDayCompleted(n)) {
+      completeBtn.textContent = '✓ Concluído (desmarcar)';
+      completeBtn.classList.remove('btn-primary');
+      completeBtn.classList.add('btn-secondary', 'text-base', 'py-4');
+      completeBtn.onclick = () => { unmarkComplete(n); renderModule(n); };
+    } else {
+      completeBtn.textContent = 'Marcar como concluído ✓';
+      completeBtn.classList.remove('btn-secondary', 'text-base', 'py-4');
+      completeBtn.classList.add('btn-primary');
+      completeBtn.onclick = () => {
+        markComplete(n);
+        location.hash = '#dashboard';
+      };
+    }
+  }
+
+
+  // ============================================================
+  // USER MENU
+  // ============================================================
+  function openUserMenu() {
+    document.getElementById('user-menu').classList.remove('hidden');
+  }
+  function closeUserMenu() {
+    document.getElementById('user-menu').classList.add('hidden');
+  }
+  function toggleUserMenu() {
+    document.getElementById('user-menu').classList.toggle('hidden');
+  }
+
+
+  // ============================================================
+  // INIT
+  // ============================================================
+  function init() {
+    loadState();
+
+    // Login form
+    document.getElementById('login-form').addEventListener('submit', e => {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value;
+      if (login(email)) {
+        location.hash = '#dashboard';
+        if (location.hash === '#dashboard') navigate(); // edge: same hash
+      }
+    });
+
+    // User menu
+    document.getElementById('user-menu-btn').addEventListener('click', e => {
+      e.stopPropagation();
+      toggleUserMenu();
+    });
+    document.addEventListener('click', e => {
+      const menu = document.getElementById('user-menu');
+      if (!menu.contains(e.target)) closeUserMenu();
+    });
+
+    // Menu actions
+    document.querySelectorAll('[data-action]').forEach(el => {
+      el.addEventListener('click', e => {
+        e.preventDefault();
+        const action = el.dataset.action;
+        if (action === 'logout') logout();
+        if (action === 'reset') resetAll();
+        if (action === 'toggle-demo') toggleDemo();
+      });
+    });
+
+    window.addEventListener('hashchange', navigate);
+
+    // Refresh countdowns every minute on dashboard
+    setInterval(() => {
+      if (location.hash === '#dashboard' && state.user) renderDashboard();
+    }, 60000);
+
+    navigate();
+  }
+
+  document.addEventListener('DOMContentLoaded', init);
+</script>
+
+</body>
+</html>
